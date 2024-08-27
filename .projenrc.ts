@@ -30,10 +30,10 @@ const githubActionPinnedVersions = {
 };
 
 const project = new cdk.JsiiProject({
-  name: "@cdktf/provider-project",
+  name: "@intelligent-growth-solutions/provider-grafana",
   author: "HashiCorp",
   authorAddress: "https://hashicorp.com",
-  repositoryUrl: "https://github.com/cdktf/cdktf-provider-project.git",
+  repositoryUrl: "https://github.com/intelligent-growth-solutions/cdktf-provider-grafana.git",
   authorOrganization: true,
   licensed: false, // we do supply our own license file with a custom header
   pullRequestTemplate: false,
