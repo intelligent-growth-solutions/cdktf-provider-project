@@ -239,6 +239,7 @@ export class CdktfProviderProject extends cdk.JsiiProject {
 
     super({
       ...options,
+      npmRegistryUrl: "https://npm.pkg.github.com",
       authorAddress,
       authorName,
       minNodeVersion,

@@ -542,8 +542,8 @@ jobs:
       - name: Deprecate the package on NPM
         if: steps.check_status.outputs.is_deprecated == 'true' || steps.check_status.outputs.is_deprecated == true
         env:
-          NPM_REGISTRY: registry.npmjs.org
-          NPM_TOKEN: \${{ secrets.NPM_TOKEN }}
+          NPM_REGISTRY: npm.pkg.github.com
+          NPM_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |-
           npm set "//$NPM_REGISTRY/:_authToken=$NPM_TOKEN"
           npm deprecate @cdktf/provider-random "See https://cdk.tf/imports for details on how to continue to use the random provider in your CDK for Terraform (CDKTF) projects by generating the bindings locally."
@@ -602,6 +602,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      packages: write
       issues: write
     if: needs.release.outputs.tag_exists != 'true' && needs.release.outputs.latest_commit == github.sha
     steps:
@@ -627,8 +628,8 @@ jobs:
       - name: Release
         env:
           NPM_DIST_TAG: latest
-          NPM_REGISTRY: registry.npmjs.org
-          NPM_TOKEN: \${{ secrets.NPM_TOKEN }}
+          NPM_REGISTRY: npm.pkg.github.com
+          NPM_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: npx -p publib@latest publib-npm
       - name: Extract Version
         id: extract-version
@@ -2846,8 +2847,8 @@ jobs:
       - name: Deprecate the package on NPM
         if: steps.check_status.outputs.is_deprecated == 'true' || steps.check_status.outputs.is_deprecated == true
         env:
-          NPM_REGISTRY: registry.npmjs.org
-          NPM_TOKEN: \${{ secrets.NPM_TOKEN }}
+          NPM_REGISTRY: npm.pkg.github.com
+          NPM_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |-
           npm set "//$NPM_REGISTRY/:_authToken=$NPM_TOKEN"
           npm deprecate @cdktf/provider-random "See https://cdk.tf/imports for details on how to continue to use the random provider in your CDK for Terraform (CDKTF) projects by generating the bindings locally."
@@ -2906,6 +2907,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      packages: write
       issues: write
     if: needs.release.outputs.tag_exists != 'true' && needs.release.outputs.latest_commit == github.sha
     steps:
@@ -2931,8 +2933,8 @@ jobs:
       - name: Release
         env:
           NPM_DIST_TAG: latest
-          NPM_REGISTRY: registry.npmjs.org
-          NPM_TOKEN: \${{ secrets.NPM_TOKEN }}
+          NPM_REGISTRY: npm.pkg.github.com
+          NPM_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: npx -p publib@latest publib-npm
       - name: Extract Version
         id: extract-version
@@ -5573,8 +5575,8 @@ jobs:
       - name: Deprecate the package on NPM
         if: steps.check_status.outputs.is_deprecated == 'true' || steps.check_status.outputs.is_deprecated == true
         env:
-          NPM_REGISTRY: registry.npmjs.org
-          NPM_TOKEN: \${{ secrets.NPM_TOKEN }}
+          NPM_REGISTRY: npm.pkg.github.com
+          NPM_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |-
           npm set "//$NPM_REGISTRY/:_authToken=$NPM_TOKEN"
           npm deprecate @cdktf/provider-random "See https://cdk.tf/imports for details on how to continue to use the random provider in your CDK for Terraform (CDKTF) projects by generating the bindings locally."
@@ -5633,6 +5635,7 @@ jobs:
     runs-on: custom-linux-medium
     permissions:
       contents: read
+      packages: write
       issues: write
     if: needs.release.outputs.tag_exists != 'true' && needs.release.outputs.latest_commit == github.sha
     steps:
@@ -5658,8 +5661,8 @@ jobs:
       - name: Release
         env:
           NPM_DIST_TAG: latest
-          NPM_REGISTRY: registry.npmjs.org
-          NPM_TOKEN: \${{ secrets.NPM_TOKEN }}
+          NPM_REGISTRY: npm.pkg.github.com
+          NPM_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: npx -p publib@latest publib-npm
       - name: Extract Version
         id: extract-version
@@ -8300,8 +8303,8 @@ jobs:
       - name: Deprecate the package on NPM
         if: steps.check_status.outputs.is_deprecated == 'true' || steps.check_status.outputs.is_deprecated == true
         env:
-          NPM_REGISTRY: registry.npmjs.org
-          NPM_TOKEN: \${{ secrets.NPM_TOKEN }}
+          NPM_REGISTRY: npm.pkg.github.com
+          NPM_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |-
           npm set "//$NPM_REGISTRY/:_authToken=$NPM_TOKEN"
           npm deprecate @cdktf/provider-random "See https://cdk.tf/imports for details on how to continue to use the random provider in your CDK for Terraform (CDKTF) projects by generating the bindings locally."
@@ -8360,6 +8363,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      packages: write
       issues: write
     if: needs.release.outputs.tag_exists != 'true' && needs.release.outputs.latest_commit == github.sha
     steps:
@@ -8385,8 +8389,8 @@ jobs:
       - name: Release
         env:
           NPM_DIST_TAG: latest
-          NPM_REGISTRY: registry.npmjs.org
-          NPM_TOKEN: \${{ secrets.NPM_TOKEN }}
+          NPM_REGISTRY: npm.pkg.github.com
+          NPM_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: npx -p publib@latest publib-npm
       - name: Extract Version
         id: extract-version
@@ -11037,8 +11041,8 @@ jobs:
       - name: Deprecate the package on NPM
         if: steps.check_status.outputs.is_deprecated == 'true' || steps.check_status.outputs.is_deprecated == true
         env:
-          NPM_REGISTRY: registry.npmjs.org
-          NPM_TOKEN: \${{ secrets.NPM_TOKEN }}
+          NPM_REGISTRY: npm.pkg.github.com
+          NPM_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: |-
           npm set "//$NPM_REGISTRY/:_authToken=$NPM_TOKEN"
           npm deprecate @cdktf/provider-acme "See https://cdk.tf/imports for details on how to continue to use the acme provider in your CDK for Terraform (CDKTF) projects by generating the bindings locally."
@@ -11097,6 +11101,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      packages: write
       issues: write
     if: needs.release.outputs.tag_exists != 'true' && needs.release.outputs.latest_commit == github.sha
     steps:
@@ -11122,8 +11127,8 @@ jobs:
       - name: Release
         env:
           NPM_DIST_TAG: latest
-          NPM_REGISTRY: registry.npmjs.org
-          NPM_TOKEN: \${{ secrets.NPM_TOKEN }}
+          NPM_REGISTRY: npm.pkg.github.com
+          NPM_TOKEN: \${{ secrets.GITHUB_TOKEN }}
         run: npx -p publib@latest publib-npm
       - name: Extract Version
         id: extract-version
