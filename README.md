@@ -1,6 +1,6 @@
 # Terraform CDK Grafana Provider
 
-Forked from https://github.com/cdktf/cdktf-provider-project
+Forked from https://github.com/cdktf/cdktf-provider-project.
 
 Run
 
@@ -17,15 +17,23 @@ The provider repos are entirely auto generated from the configuration contained 
 
 ### Creating a new provider
 
-Add a new repository [over here](https://github.com/terraform-cdk-providers/repository-manager).
+~~Add a new repository [over here](https://github.com/terraform-cdk-providers/repository-manager).~~
+
+Create a new repository. Add an .npmrc file with the following content
+```
+@intelligent-growth-solutions:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+always-auth=true
+engine-strict=true
+```
 
 In the newly created repository, all we need is a `.projenrc.js` file like this:
 
 ```js
-const { CdktfProviderProject } = require('@cdktf/provider-project');
+const { CdktfProviderProject } = require('@intelligent-growth-solutions/provider-project');
 const { Semver } = require('projen');
 
-const project = new CdktfProviderProject({
+const project = new intelligent-growth-solutionsProviderProject({
   terraformProvider: "aws@~> 2.0"
 });
 
@@ -35,7 +43,7 @@ project.synth();
 Adjust the `terraformProvider` attribute as required and run the following commands:
 
 ```
-npm install @cdktf/provider-project@latest
+npm install @intelligent-growth-solutions/provider-project@latest
 npx projen
 yarn install
 ```
