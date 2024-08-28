@@ -1,8 +1,8 @@
 {
-  "name": "@intelligent-growth-solutions/provider-grafana",
+  "name": "@intelligent-growth-solutions/provider-project",
   "repository": {
     "type": "git",
-    "url": "https://github.com/intelligent-growth-solutions/cdktf-provider-grafana.git"
+    "url": "https://github.com/intelligent-growth-solutions/cdktf-provider-project.git"
   },
   "scripts": {
     "build": "npx projen build",

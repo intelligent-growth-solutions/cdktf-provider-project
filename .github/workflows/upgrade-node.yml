@@ -3,7 +3,7 @@
 name: upgrade-node
 on:
   schedule:
-    - cron: 4 3 * * *
+    - cron: 31 3 * * *
   workflow_dispatch: {}
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
