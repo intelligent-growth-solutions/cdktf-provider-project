@@ -34,6 +34,7 @@ const project = new cdk.JsiiProject({
   author: "HashiCorp",
   authorAddress: "https://hashicorp.com",
   repositoryUrl: "https://github.com/intelligent-growth-solutions/cdktf-provider-grafana.git",
+  npmRegistryUrl: 'https://npm.pkg.github.com',
   authorOrganization: true,
   licensed: false, // we do supply our own license file with a custom header
   pullRequestTemplate: false,
