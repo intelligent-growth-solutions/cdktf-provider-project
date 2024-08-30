@@ -72,6 +72,11 @@ export interface CdktfProviderProjectOptions extends cdk.JsiiProjectOptions {
    * defaults to "HashiCorp, Inc."
    */
   readonly licensee?: string;
+
+  /**
+   * Override for igs packages, defaults to github
+   */
+  readonly npmRegistryUrl?: string;
 }
 
 const getMavenName = (providerName: string): string => {
@@ -119,6 +124,7 @@ export class CdktfProviderProject extends cdk.JsiiProject {
       mavenEndpoint = "https://hashicorp.oss.sonatype.org",
       nugetOrg = "HashiCorp",
       mavenOrg = "hashicorp",
+      npmRegistryUrl = "https://npm.pkg.github.com",
     } = options;
 
     const [fqproviderName, providerVersion] = terraformProvider.split("@");
@@ -239,12 +245,12 @@ export class CdktfProviderProject extends cdk.JsiiProject {
 
     super({
       ...options,
-      npmRegistryUrl: "https://npm.pkg.github.com",
       authorAddress,
       authorName,
       minNodeVersion,
       workflowContainerImage,
       workflowRunsOn,
+      npmRegistryUrl,
       licensed: false, // we do supply our own license file with a custom header
       releaseToNpm: true,
       devDeps: [
