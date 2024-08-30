@@ -482,6 +482,7 @@ jobs:
       tag_exists: \${{ steps.check_tag_exists.outputs.exists }}
     env:
       CI: "true"
+      GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
@@ -644,6 +645,9 @@ jobs:
           labels: failed-release
           title: Publishing v\${{ steps.extract-version.outputs.VERSION }} to npm failed
           body: See https://github.com/\${{ github.repository }}/actions/runs/\${{ github.run_id }}
+    env:
+      CI: "true"
+      GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
   release_maven:
     name: Publish to Maven Central
     needs: release
@@ -2789,6 +2793,7 @@ jobs:
       tag_exists: \${{ steps.check_tag_exists.outputs.exists }}
     env:
       CI: "true"
+      GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
@@ -2949,6 +2954,9 @@ jobs:
           labels: failed-release
           title: Publishing v\${{ steps.extract-version.outputs.VERSION }} to npm failed
           body: See https://github.com/\${{ github.repository }}/actions/runs/\${{ github.run_id }}
+    env:
+      CI: "true"
+      GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
   release_maven:
     name: Publish to Maven Central
     needs: release
@@ -5517,6 +5525,7 @@ jobs:
       tag_exists: \${{ steps.check_tag_exists.outputs.exists }}
     env:
       CI: "true"
+      GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
@@ -5677,6 +5686,9 @@ jobs:
           labels: failed-release
           title: Publishing v\${{ steps.extract-version.outputs.VERSION }} to npm failed
           body: See https://github.com/\${{ github.repository }}/actions/runs/\${{ github.run_id }}
+    env:
+      CI: "true"
+      GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
   release_maven:
     name: Publish to Maven Central
     needs: release
@@ -8245,6 +8257,7 @@ jobs:
       tag_exists: \${{ steps.check_tag_exists.outputs.exists }}
     env:
       CI: "true"
+      GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
@@ -8405,6 +8418,9 @@ jobs:
           labels: failed-release
           title: Publishing v\${{ steps.extract-version.outputs.VERSION }} to npm failed
           body: See https://github.com/\${{ github.repository }}/actions/runs/\${{ github.run_id }}
+    env:
+      CI: "true"
+      GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
   release_maven:
     name: Publish to Maven Central
     needs: release
@@ -10979,6 +10995,7 @@ jobs:
       tag_exists: \${{ steps.check_tag_exists.outputs.exists }}
     env:
       CI: "true"
+      GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
@@ -11143,6 +11160,9 @@ jobs:
           labels: failed-release
           title: Publishing v\${{ steps.extract-version.outputs.VERSION }} to npm failed
           body: See https://github.com/\${{ github.repository }}/actions/runs/\${{ github.run_id }}
+    env:
+      CI: "true"
+      GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
   release_maven:
     name: Publish to Maven Central
     needs: release
