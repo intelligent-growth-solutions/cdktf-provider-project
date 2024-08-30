@@ -472,14 +472,26 @@ export class CdktfProviderProject extends cdk.JsiiProject {
     const releaseWorkflow = this.tryFindObjectFile(
       ".github/workflows/release.yml"
     );
-    // const release_step = minNodeVersion ? 4 : 3;
-    releaseWorkflow?.addOverride(`jobs.release.env`, {
-      CI: "true",
-      GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
-    });
-    releaseWorkflow?.addOverride("jobs.release_npm.env", {
-      CI: "true",
-      GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
+
+    const release_tags = [
+      "release",
+      "deprecate",
+      "release_npm",
+      "release_maven",
+      "release_pypi",
+      "release_nuget",
+      "release_golang",
+    ];
+    release_tags.forEach((tag) => {
+      releaseWorkflow?.addOverride(`jobs.${tag}.env`, {
+        CI: "true",
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
+      });
+
+      releaseWorkflow?.addOverride(`jobs.${tag}.permissions`, {
+        packages: "read",
+        ...this.getBasePermissionsFor(tag),
+      });
     });
 
     // Submodule documentation generation
@@ -559,6 +571,33 @@ export class CdktfProviderProject extends cdk.JsiiProject {
     Object.entries(pinnedVersions).forEach(([name, sha]) => {
       this.github?.actions.set(name, `${name}@${sha}`);
     });
+  }
+
+  private getBasePermissionsFor(tag: string): { [key: string]: string } {
+    if (tag == "release") {
+      return {
+        contents: "write",
+      };
+    } else if (tag == "deprecate") {
+      return {
+        contents: "read",
+      };
+    } else if (tag == "release_github") {
+      return {
+        contents: "write",
+        issues: "write",
+      };
+    } else if (tag == "release_npm") {
+      return {
+        contents: "write",
+        packages: "write",
+        issues: "write",
+      };
+    } else
+      return {
+        contents: "read",
+        issues: "write",
+      };
   }
 }
 
