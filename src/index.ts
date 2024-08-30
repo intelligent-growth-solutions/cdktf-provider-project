@@ -469,6 +469,19 @@ export class CdktfProviderProject extends cdk.JsiiProject {
       },
     ]);
 
+    const releaseWorkflow = this.tryFindObjectFile(
+      ".github/workflows/release.yml"
+    );
+    // const release_step = minNodeVersion ? 4 : 3;
+    releaseWorkflow?.addOverride(`jobs.release.env`, {
+      CI: "true",
+      GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
+    });
+    releaseWorkflow?.addOverride("jobs.release_npm.env", {
+      CI: "true",
+      GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
+    });
+
     // Submodule documentation generation
     this.gitignore.exclude("API.md"); // ignore the old file, we now generate it in the docs folder
     this.addDevDeps("jsii-docgen@^10.2.3");
