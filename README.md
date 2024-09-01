@@ -9,6 +9,12 @@ yarn install
 yarn build
 ```
 
+Changes made from cdktf project:
+
+- update `npmRegistryUrl` in `src/index.js` to point at github package registry
+- update `.projenrc.ts` to change project details
+- override env var and token permissions to retrieve package in Github actions
+
 A project template for [projen](https://github.com/eladb/projen) to create repositories for prebuilt provider packages for [Terraform CDK](https://cdk.tf).
 
 ## Usage

@@ -72,6 +72,8 @@ export interface CdktfProviderProjectOptions extends cdk.JsiiProjectOptions {
    * defaults to "HashiCorp, Inc."
    */
   readonly licensee?: string;
+
+  readonly npmInstallEnvVar?: string;
 }
 
 const getMavenName = (providerName: string): string => {
@@ -119,6 +121,7 @@ export class CdktfProviderProject extends cdk.JsiiProject {
       mavenEndpoint = "https://hashicorp.oss.sonatype.org",
       nugetOrg = "HashiCorp",
       mavenOrg = "hashicorp",
+      npmInstallEnvVar = "GITHUB_TOKEN",
     } = options;
 
     const [fqproviderName, providerVersion] = terraformProvider.split("@");
@@ -485,7 +488,7 @@ export class CdktfProviderProject extends cdk.JsiiProject {
     release_tags.forEach((tag) => {
       releaseWorkflow?.addOverride(`jobs.${tag}.env`, {
         CI: "true",
-        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
+        GITHUB_TOKEN: `\${{ secrets.${npmInstallEnvVar} }}`,
       });
 
       releaseWorkflow?.addOverride(`jobs.${tag}.permissions`, {

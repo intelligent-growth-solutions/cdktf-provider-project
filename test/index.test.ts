@@ -13,7 +13,6 @@ const getProject = (
     terraformProvider: "random@~>2.0",
     cdktfVersion: "0.10.3",
     constructsVersion: "10.0.0",
-    // minNodeVersion: "18.20.0",
     jsiiVersion: "~5.2.0",
     typescriptVersion: "~5.2.0", // NOTE: this should be the same major/minor version as JSII
     devDeps: ["@cdktf/provider-project@^0.0.0"],
