@@ -885,7 +885,7 @@ scripts
       "description": "Generate documentation for the project",
       "steps": [
         {
-          "exec": "rm -rf docs && rm -f API.md && mkdir docs && jsii-docgen-l typescript -o docs/typescript.md"
+          "exec": "rm -rf docs && rm -f API.md && mkdir docs && jsii-docgen -l typescript -o docs/typescript.md"
         }
       ]
     },
@@ -2909,7 +2909,7 @@ scripts
       "description": "Generate documentation for the project",
       "steps": [
         {
-          "exec": "rm -rf docs && rm -f API.md && mkdir docs && jsii-docgen-l typescript -o docs/typescript.md"
+          "exec": "rm -rf docs && rm -f API.md && mkdir docs && jsii-docgen -l typescript -o docs/typescript.md"
         }
       ]
     },
@@ -5237,7 +5237,7 @@ scripts
       "description": "Generate documentation for the project",
       "steps": [
         {
-          "exec": "rm -rf docs && rm -f API.md && mkdir docs && jsii-docgen-l typescript -o docs/typescript.md"
+          "exec": "rm -rf docs && rm -f API.md && mkdir docs && jsii-docgen -l typescript -o docs/typescript.md"
         }
       ]
     },
@@ -7565,7 +7565,7 @@ scripts
       "description": "Generate documentation for the project",
       "steps": [
         {
-          "exec": "rm -rf docs && rm -f API.md && mkdir docs && jsii-docgen-l typescript -o docs/typescript.md"
+          "exec": "rm -rf docs && rm -f API.md && mkdir docs && jsii-docgen -l typescript -o docs/typescript.md"
         }
       ]
     },
@@ -9907,7 +9907,7 @@ scripts
       "description": "Generate documentation for the project",
       "steps": [
         {
-          "exec": "rm -rf docs && rm -f API.md && mkdir docs && jsii-docgen-l typescript -o docs/typescript.md"
+          "exec": "rm -rf docs && rm -f API.md && mkdir docs && jsii-docgen -l typescript -o docs/typescript.md"
         }
       ]
     },

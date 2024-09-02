@@ -519,7 +519,7 @@ export class CdktfProviderProject extends cdk.JsiiProject {
             "rm -rf docs",
             "rm -f API.md",
             "mkdir docs",
-            "jsii-docgen-l typescript -o docs/typescript.md",
+            "jsii-docgen -l typescript -o docs/typescript.md",
             // There is no nice way to tell jsii-docgen to generate docs into a folder so I went this route
             // "mv *.*.md docs",
             // Some part of the documentation are too long, we need to truncate them to ~10MB
