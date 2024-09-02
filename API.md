@@ -1693,7 +1693,7 @@ const cdktfProviderProjectOptions: CdktfProviderProjectOptions = { ... }
 | <code><a href="#@intelligent-growth-solutions/provider-project.CdktfProviderProjectOptions.property.mavenGroupId">mavenGroupId</a></code> | <code>string</code> | defaults to "com.${mavenOrg}". |
 | <code><a href="#@intelligent-growth-solutions/provider-project.CdktfProviderProjectOptions.property.mavenOrg">mavenOrg</a></code> | <code>string</code> | defaults to "hashicorp". |
 | <code><a href="#@intelligent-growth-solutions/provider-project.CdktfProviderProjectOptions.property.namespace">namespace</a></code> | <code>string</code> | defaults to "cdktf". |
-| <code><a href="#@intelligent-growth-solutions/provider-project.CdktfProviderProjectOptions.property.npmInstallEnvVar">npmInstallEnvVar</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#@intelligent-growth-solutions/provider-project.CdktfProviderProjectOptions.property.npmInstallEnvVar">npmInstallEnvVar</a></code> | <code>string</code> | Github secret name where Token is stored as an env var for installing yarn packages. |
 | <code><a href="#@intelligent-growth-solutions/provider-project.CdktfProviderProjectOptions.property.nugetOrg">nugetOrg</a></code> | <code>string</code> | defaults to "HashiCorp". |
 | <code><a href="#@intelligent-growth-solutions/provider-project.CdktfProviderProjectOptions.property.useCustomGithubRunner">useCustomGithubRunner</a></code> | <code>boolean</code> | *No description.* |
 
@@ -4136,6 +4136,8 @@ public readonly npmInstallEnvVar: string;
 ```
 
 - *Type:* string
+
+Github secret name where Token is stored as an env var for installing yarn packages.
 
 ---
 

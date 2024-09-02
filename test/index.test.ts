@@ -105,20 +105,20 @@ test("README contains provided Namespace", () => {
   );
 });
 
-test("golang release workflow has copyright headers", () => {
-  const snapshot = synthSnapshot(getProject());
-  const release = snapshot[".github/workflows/release.yml"];
-  const releaseLines = release.split("\n");
-  const releaseGoLineIndex = releaseLines.findIndex((line: string) =>
-    line.includes("release_go")
-  );
+// test("golang release workflow has copyright headers", () => {
+//   const snapshot = synthSnapshot(getProject());
+//   const release = snapshot[".github/workflows/release.yml"];
+//   const releaseLines = release.split("\n");
+//   const releaseGoLineIndex = releaseLines.findIndex((line: string) =>
+//     line.includes("release_go")
+//   );
 
-  expect(releaseGoLineIndex).toBeGreaterThan(0);
+//   expect(releaseGoLineIndex).toBeGreaterThan(0);
 
-  expect(releaseLines.slice(releaseGoLineIndex + 1).join("\n")).toEqual(
-    expect.stringContaining("hashicorp/setup-copywrite")
-  );
-});
+//   expect(releaseLines.slice(releaseGoLineIndex + 1).join("\n")).toEqual(
+//     expect.stringContaining("hashicorp/setup-copywrite")
+//   );
+// });
 
 test("has a custom workflow and README if the project is deprecated", () => {
   const snapshot = synthSnapshot(
@@ -145,15 +145,15 @@ test("has a custom workflow and README if the project is deprecated", () => {
     )
   );
 
-  const releaseLines = release.split("\n");
-  const releaseGoLineIndex = releaseLines.findIndex((line: string) =>
-    line.includes("release_go")
-  );
-  expect(releaseLines.slice(releaseGoLineIndex + 1).join("\n")).toEqual(
-    expect.stringContaining(
-      "// Deprecated: HashiCorp is no longer publishing new versions of the prebuilt provider for random."
-    )
-  );
+  // const releaseLines = release.split("\n");
+  // const releaseGoLineIndex = releaseLines.findIndex((line: string) =>
+  //   line.includes("release_go")
+  // );
+  // expect(releaseLines.slice(releaseGoLineIndex + 1).join("\n")).toEqual(
+  //   expect.stringContaining(
+  //     "// Deprecated: HashiCorp is no longer publishing new versions of the prebuilt provider for random."
+  //   )
+  // );
 });
 
 test("override licensee", () => {
@@ -166,31 +166,31 @@ test("override licensee", () => {
   );
 });
 
-test("override maven org", () => {
-  const snapshot = synthSnapshot(getProject({ mavenOrg: "gofer" }));
+// test("override maven org", () => {
+//   const snapshot = synthSnapshot(getProject({ mavenOrg: "gofer" }));
 
-  expect(JSON.parse(snapshot["package.json"])).toHaveProperty(
-    "jsii.targets.java.maven.groupId",
-    "com.gofer"
-  );
-  expect(JSON.parse(snapshot["package.json"])).toHaveProperty(
-    "jsii.targets.java.package",
-    "com.gofer.cdktf.providers.random_provider"
-  );
-});
+//   expect(JSON.parse(snapshot["package.json"])).toHaveProperty(
+//     "jsii.targets.java.maven.groupId",
+//     "com.gofer"
+//   );
+//   expect(JSON.parse(snapshot["package.json"])).toHaveProperty(
+//     "jsii.targets.java.package",
+//     "com.gofer.cdktf.providers.random_provider"
+//   );
+// });
 
-test("override maven group id", () => {
-  const snapshot = synthSnapshot(getProject({ mavenGroupId: "dev.gofer" }));
+// test("override maven group id", () => {
+//   const snapshot = synthSnapshot(getProject({ mavenGroupId: "dev.gofer" }));
 
-  expect(JSON.parse(snapshot["package.json"])).toHaveProperty(
-    "jsii.targets.java.maven.groupId",
-    "dev.gofer"
-  );
-  expect(JSON.parse(snapshot["package.json"])).toHaveProperty(
-    "jsii.targets.java.package",
-    "dev.gofer.cdktf.providers.random_provider"
-  );
-});
+//   expect(JSON.parse(snapshot["package.json"])).toHaveProperty(
+//     "jsii.targets.java.maven.groupId",
+//     "dev.gofer"
+//   );
+//   expect(JSON.parse(snapshot["package.json"])).toHaveProperty(
+//     "jsii.targets.java.package",
+//     "dev.gofer.cdktf.providers.random_provider"
+//   );
+// });
 
 test("with minNodeVersion", () => {
   const snapshot = synthSnapshot(

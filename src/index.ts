@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 import assert = require("assert");
 import { pascalCase } from "change-case";
-import { TextFile, cdk, github, JsonPatch } from "projen";
+import { TextFile, cdk } from "projen";
 import { JobStep } from "projen/lib/github/workflows-model";
 import { UpgradeDependenciesSchedule } from "projen/lib/javascript";
 import { AlertOpenPrs } from "./alert-open-prs";
@@ -73,6 +73,9 @@ export interface CdktfProviderProjectOptions extends cdk.JsiiProjectOptions {
    */
   readonly licensee?: string;
 
+  /**
+   * Github secret name where Token is stored as an env var for installing yarn packages
+   */
   readonly npmInstallEnvVar?: string;
 }
 
@@ -272,10 +275,10 @@ export class CdktfProviderProject extends cdk.JsiiProject {
           schedule: UpgradeDependenciesSchedule.WEEKLY,
         },
       },
-      python: packageInfo.python,
-      publishToNuget: packageInfo.publishToNuget,
-      publishToMaven: packageInfo.publishToMaven,
-      publishToGo: packageInfo.publishToGo,
+      // python: packageInfo.python,
+      // publishToNuget: packageInfo.publishToNuget,
+      // publishToMaven: packageInfo.publishToMaven,
+      // publishToGo: packageInfo.publishToGo,
       releaseFailureIssue: true,
       peerDependencyOptions: {
         pinnedDevDependency: false,
@@ -359,13 +362,13 @@ export class CdktfProviderProject extends cdk.JsiiProject {
     }
 
     // Fix maven issue (https://github.com/cdklabs/publib/pull/777)
-    github.GitHub.of(this)?.tryFindWorkflow("release")?.file?.patch(
-      JsonPatch.add(
-        "/jobs/release_maven/steps/8/env/MAVEN_OPTS",
-        // See https://stackoverflow.com/questions/70153962/nexus-staging-maven-plugin-maven-deploy-failed-an-api-incompatibility-was-enco
-        "--add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.text=ALL-UNNAMED --add-opens=java.desktop/java.awt.font=ALL-UNNAMED"
-      )
-    );
+    // github.GitHub.of(this)?.tryFindWorkflow("release")?.file?.patch(
+    //   JsonPatch.add(
+    //     "/jobs/release_maven/steps/8/env/MAVEN_OPTS",
+    //     // See https://stackoverflow.com/questions/70153962/nexus-staging-maven-plugin-maven-deploy-failed-an-api-incompatibility-was-enco
+    //     "--add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.text=ALL-UNNAMED --add-opens=java.desktop/java.awt.font=ALL-UNNAMED"
+    //   )
+    // );
 
     this.pinGithubActionVersions(githubActionPinnedVersions);
 
@@ -480,10 +483,10 @@ export class CdktfProviderProject extends cdk.JsiiProject {
       "release",
       "deprecate",
       "release_npm",
-      "release_maven",
-      "release_pypi",
-      "release_nuget",
-      "release_golang",
+      // "release_maven",
+      // "release_pypi",
+      // "release_nuget",
+      // "release_golang",
     ];
     release_tags.forEach((tag) => {
       releaseWorkflow?.addOverride(`jobs.${tag}.env`, {
