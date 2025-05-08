@@ -58,7 +58,13 @@ export class ProviderUpgrade {
             name: "Checkout",
             uses: "actions/checkout@v4",
           },
-          { run: "yarn install" },
+          {
+            run: "yarn install",
+            env: {
+              CHECKPOINT_DISABLE: "1",
+              GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
+            },
+          },
           {
             id: "check_version",
             run: "yarn check-if-new-provider-version",
