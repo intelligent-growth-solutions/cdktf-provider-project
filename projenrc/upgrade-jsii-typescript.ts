@@ -8,27 +8,28 @@ import { JobPermission } from "projen/lib/github/workflows-model";
 import { generateRandomCron } from "../src/util/random-cron";
 
 /**
- * Auto-updates Node to the next LTS version a month before the previous one goes EOL
- * Can also be triggered manually with a hard-coded version of Node.js as input
+ * Helper script for upgrading JSII and TypeScript in the right way.
+ * Auto-updates to the next version a month before the previous JSII version goes EOS
+ * Can also be triggered manually with a hard-coded version of JSII/TypeScript as input
+ * https://github.com/aws/jsii-compiler/blob/main/README.md#gear-maintenance--support
  *
  * NOTE: This script is only used by cdktf-provider-project itself, not by the individual providers
  */
-export class UpgradeNode {
-  constructor(project: javascript.NodeProject) {
-    const workflow = project.github?.addWorkflow("upgrade-node");
-
+export class UpgradeJSIIAndTypeScript {
+  constructor(project: javascript.NodeProject, typescriptVersion: string) {
+    const workflow = project.github?.addWorkflow("upgrade-jsii-typescript");
     if (!workflow) throw new Error("no workflow defined");
 
+    const plainVersion = typescriptVersion.replace("~", "");
     workflow.on({
       // run daily sometime between midnight and 6am UTC
       schedule: [
-        { cron: generateRandomCron({ project, maxHour: 3, hourOffset: 2 }) },
+        { cron: generateRandomCron({ project, maxHour: 3, hourOffset: 1 }) },
       ],
       workflowDispatch: {
         inputs: {
           version: {
-            description:
-              "Node.js version to upgrade to, in the format: 12.34.56",
+            description: `New JSII/TypeScript version (e.g. "${plainVersion}"), without carets or tildes`,
             required: false,
             type: "string",
           },
@@ -61,26 +62,27 @@ export class UpgradeNode {
             run: "yarn install",
           },
           {
-            name: "Get current Node.js version",
+            name: "Get current JSII version",
             id: "current_version",
             run: [
-              `ENGINES_NODE_VERSION=$(npm pkg get engines.node | tr -d '"')`,
-              `CURRENT_VERSION=$(cut -d " " -f 2 <<< "$ENGINES_NODE_VERSION")`,
+              `CURRENT_VERSION=$(npm list jsii --depth=0 --json | jq -r '.dependencies.jsii.version')`,
+              `CURRENT_VERSION_SHORT=$(cut -d "." -f 1,2 <<< "$CURRENT_VERSION")`,
               `CURRENT_VERSION_MAJOR=$(cut -d "." -f 1 <<< "$CURRENT_VERSION")`,
               `CURRENT_VERSION_MINOR=$(cut -d "." -f 2 <<< "$CURRENT_VERSION")`,
-              `echo "CURRENT_NODEJS_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV`,
-              `echo "CURRENT_NODEJS_VERSION_MAJOR=$CURRENT_VERSION_MAJOR" >> $GITHUB_ENV`,
-              `echo "CURRENT_NODEJS_VERSION_MINOR=$CURRENT_VERSION_MINOR" >> $GITHUB_ENV`,
+              `echo "CURRENT_JSII_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV`,
+              `echo "CURRENT_JSII_VERSION_SHORT=$CURRENT_VERSION_SHORT" >> $GITHUB_ENV`,
+              `echo "CURRENT_JSII_VERSION_MAJOR=$CURRENT_VERSION_MAJOR" >> $GITHUB_ENV`,
+              `echo "CURRENT_JSII_VERSION_MINOR=$CURRENT_VERSION_MINOR" >> $GITHUB_ENV`,
               `echo "value=$CURRENT_VERSION" >> $GITHUB_OUTPUT`,
             ].join("\n"),
           },
           {
-            name: "Get the earliest supported Node.js version whose EOL date is at least a month away",
+            name: "Get the earliest supported JSII version whose EOS date is at least a month away",
             if: "${{ ! inputs.version }}",
             uses: "actions/github-script",
             with: {
               script: [
-                `const script = require('./projenrc/scripts/check-node-versions.js')`,
+                `const script = require('./projenrc/scripts/check-jsii-versions.js')`,
                 `await script({github, context, core})`,
               ].join("\n"),
             },
@@ -88,26 +90,31 @@ export class UpgradeNode {
           {
             // In an ideal world this is where we'd validate that the manually-input version actually exists
             // In practice, I couldn't figure out how to do this properly and it wasn't worth the effort
+            // name: "Check if the manually-input version actually exists (has been published to NPM)",
             name: "Save the manually-input version to environment variables for comparison",
             if: "${{ inputs.version }}",
             env: {
               NEW_VERSION: "${{ inputs.version }}",
             },
             run: [
+              // My command line skillz aren't good enough to figure out how to make the below work (error if the version doesn't exist)
+              // `yarn info jsii versions --json | jq -e 'select(.data | index("$NEW_VERSION"))`,
+              `NEW_VERSION_SHORT=$(cut -d "." -f 1,2 <<< "$NEW_VERSION")`,
               `NEW_VERSION_MAJOR=$(cut -d "." -f 1 <<< "$NEW_VERSION")`,
               `NEW_VERSION_MINOR=$(cut -d "." -f 2 <<< "$NEW_VERSION")`,
-              `echo "NEW_NODEJS_VERSION=$NEW_VERSION" >> $GITHUB_ENV`,
-              `echo "NEW_NODEJS_VERSION_MAJOR=$NEW_VERSION_MAJOR" >> $GITHUB_ENV`,
-              `echo "NEW_NODEJS_VERSION_MINOR=$NEW_VERSION_MINOR" >> $GITHUB_ENV`,
+              `echo "NEW_JSII_VERSION=$NEW_VERSION" >> $GITHUB_ENV`,
+              `echo "NEW_JSII_VERSION_SHORT=$NEW_VERSION_SHORT" >> $GITHUB_ENV`,
+              `echo "NEW_JSII_VERSION_MAJOR=$NEW_VERSION_MAJOR" >> $GITHUB_ENV`,
+              `echo "NEW_JSII_VERSION_MINOR=$NEW_VERSION_MINOR" >> $GITHUB_ENV`,
             ].join("\n"),
           },
           {
             name: "Output env variables for use in the next job",
             id: "latest_version",
             run: [
-              `echo "value=$NEW_NODEJS_VERSION" >> $GITHUB_OUTPUT`,
-              `echo "major=$NEW_NODEJS_VERSION_MAJOR" >> $GITHUB_OUTPUT`,
-              `[[ "$NEW_NODEJS_VERSION_MAJOR" > "$CURRENT_NODEJS_VERSION_MAJOR" || ("$NEW_NODEJS_VERSION_MAJOR" == "$CURRENT_NODEJS_VERSION_MAJOR" && "$NEW_NODEJS_VERSION_MINOR" > "$CURRENT_NODEJS_VERSION_MINOR") ]] && IS_NEWER=true`,
+              `echo "value=$NEW_JSII_VERSION" >> $GITHUB_OUTPUT`,
+              `echo "short=$NEW_JSII_VERSION_SHORT" >> $GITHUB_OUTPUT`,
+              `[[ "$NEW_JSII_VERSION_MAJOR" > "$CURRENT_JSII_VERSION_MAJOR" || ("$NEW_JSII_VERSION_MAJOR" == "$CURRENT_JSII_VERSION_MAJOR" && "$NEW_JSII_VERSION_MINOR" > "$CURRENT_JSII_VERSION_MINOR") ]] && IS_NEWER=true`,
               `echo "is_newer=$IS_NEWER" >> $GITHUB_OUTPUT`,
             ].join("\n"),
           },
@@ -121,9 +128,9 @@ export class UpgradeNode {
             stepId: "latest_version",
             outputName: "value",
           },
-          major: {
+          short: {
             stepId: "latest_version",
-            outputName: "major",
+            outputName: "short",
           },
           should_upgrade: {
             stepId: "latest_version",
@@ -135,7 +142,7 @@ export class UpgradeNode {
         },
       },
       upgrade: {
-        name: "Upgrade Node.js",
+        name: "Upgrade JSII & TypeScript",
         runsOn: ["ubuntu-latest"],
         needs: ["version"],
         if: "always() && needs.version.outputs.should_upgrade",
@@ -148,7 +155,7 @@ export class UpgradeNode {
             name: "Setup Node.js",
             uses: "actions/setup-node",
             with: {
-              "node-version": "${{ needs.version.outputs.latest }}",
+              "node-version": project.minNodeVersion,
             },
           },
           {
@@ -156,38 +163,25 @@ export class UpgradeNode {
             run: "yarn install",
           },
           {
-            name: "Set the new minNodeVersion in .projenrc.ts",
-            run: `sed -i "s/minNodeVersion: \\".*\\",/minNodeVersion: \\"$NEW_NODEJS_VERSION\\",/" ./.projenrc.ts`,
-            env: {
-              NEW_NODEJS_VERSION: "${{ needs.version.outputs.latest }}",
-            },
-          },
-          {
-            name: "Activate Projen to propagate the new version everywhere",
-            run: "yarn projen",
-            env: {
-              CI: "false", // otherwise, `npx projen` will fail because it tries to update the lockfile
-            },
+            name: "Run upgrade script",
+            run: "projenrc/scripts/update-jsii-typescript.sh ${{ needs.version.outputs.latest }}",
           },
           {
             name: "Create Pull Request",
             uses: "peter-evans/create-pull-request",
             with: {
               base: "main",
-              branch: "auto/upgrade-node-${{ needs.version.outputs.major }}",
+              branch: "auto/upgrade-jsii-ts-${{ needs.version.outputs.short }}",
               "commit-message":
-                "chore!: increase minimum supported Node.js version to ${{ needs.version.outputs.major }} for this project only",
+                "chore(deps): upgrade jsii & typescript to v${{ needs.version.outputs.short }} in this project only",
               title:
-                "chore!: increase minimum supported Node.js version to ${{ needs.version.outputs.major }} for this project only",
+                "chore(deps): upgrade jsii & typescript to v${{ needs.version.outputs.short }} in this project only",
               body: [
-                "This PR increases the minimum supported Node.js version",
-                "to `${{ needs.version.outputs.latest }}` from `${{ needs.version.outputs.current }}`",
-                "because version ${{ needs.version.outputs.current }} is less than 30 days away from EOL.",
-                "\n\nWhile this PR could be merged as-is, it is recommended that you scan the code (especially `.projenrc.ts`)",
-                "to see if there are any comments indicating changes that can/should be made when upgrading Node, such as:",
-                "\n```// The following line can be removed when upgrading to Node ${{ needs.version.outputs.major }}```",
+                "This PR increases the version of JSII and TypeScript to `~${{ needs.version.outputs.latest }}`",
+                "because the previous version is close to EOL or no longer supported. Support timeline:",
+                "https://github.com/aws/jsii-compiler/blob/main/README.md#gear-maintenance--support",
               ].join(" "),
-              labels: "automerge,automated,security",
+              labels: "auto-approve,automerge,automated",
               token: "${{ secrets.PROJEN_GITHUB_TOKEN }}",
               author: "team-tf-cdk <github-team-tf-cdk@hashicorp.com>",
               committer: "team-tf-cdk <github-team-tf-cdk@hashicorp.com>",

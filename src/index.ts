@@ -86,23 +86,24 @@ const getMavenName = (providerName: string): string => {
 };
 
 const githubActionPinnedVersions = {
-  "actions/checkout": "692973e3d937129bcbf40652eb9f2f61becf3332", // v4.1.7
-  "actions/download-artifact": "fa0a91b85d4f404e444e00e005971372dc801d16", // v4.1.8
+  "actions/checkout": "11bd71901bbe5b1630ceea73d27597364c9af683", // v4.2.2
+  "actions/download-artifact": "95815c38cf2ff2164869cbab79da8d1f422bc89e", // v4.2.1
   "actions/github-script": "60a0d83039c74a4aee543508d2ffcb1c3799cdea", // v7.0.1
-  "actions/setup-dotnet": "6bd8b7f7774af54e05809fcc5431931b3eb1ddee", // v4.0.1
-  "actions/setup-go": "0a12ed9d6a96ab950c8f026ed9f722fe0da7ef32", // v5.0.2
-  "actions/setup-java": "99b8673ff64fbf99d8d325f52d9a5bdedb8483e9", // v4.2.1
-  "actions/setup-node": "1e60f620b9541d16bece96c5465dc8ee9832be0b", // v4.0.3
-  "actions/setup-python": "39cd14951b08e74b54015e9e001cdefcf80e669f", // v5.1.1
-  "actions/stale": "28ca1036281a5e5922ead5184a1bbf96e5fc984e", // v9.0.0
-  "actions/upload-artifact": "89ef406dd8d7e03cfd12d9e0a4a378f454709029", // v4.3.5
+  "actions/setup-dotnet": "67a3573c9a986a3f9c594539f4ab511d57bb3ce9", // v4.3.1
+  "actions/setup-go": "0aaccfd150d50ccaeb58ebd88d36e91967a5f35b", // v5.4.0
+  "actions/setup-java": "3a4f6e1af504cf6a31855fa899c6aa5355ba6c12", // v4.7.0
+  "actions/setup-node": "cdca7365b2dadb8aad0a33bc7601856ffabcc48e", // v4.3.0
+  "actions/setup-python": "42375524e23c412d93fb67b49958b491fce71c38", // v5.4.0
+  "actions/stale": "5bef64f19d7facfb25b37b414482c7164d639639", // v9.1.0
+  "actions/upload-artifact": "ea165f8d65b6e75b540449e92b4886f43607fa02", // v4.6.2
   "amannn/action-semantic-pull-request":
     "0723387faaf9b38adef4775cd42cfd5155ed6017", // v5.5.3
   "dessant/lock-threads": "1bf7ec25051fe7c00bdd17e6a7cf3d7bfb7dc771", // v5.0.1
   "hashicorp/setup-copywrite": "32638da2d4e81d56a0764aa1547882fc4d209636", // v1.1.3
+  "hashicorp/setup-terraform": "b9cd54a3c349d3f38e8881555d616ced269862dd", // v3.1.2
   "imjohnbo/issue-bot": "572eed14422c4d6ca37e870f97e7da209422f5bd", // v3.4.4
-  "peter-evans/create-pull-request": "c5a7806660adbe173f04e3e038b0ccdcd758773c", // v6.1.0
-  "slackapi/slack-github-action": "70cd7be8e40a46e8b0eced40b0de447bdb42f68e", // v1.26.0
+  "peter-evans/create-pull-request": "271a8d0340265f705b14b6d32b9829c1cb33d45e", // v7.0.8
+  "slackapi/slack-github-action": "485a9d42d3a73031f12ec201c457e2162c45d02d", // v2.0.0
 };
 
 export class CdktfProviderProject extends cdk.JsiiProject {
@@ -181,12 +182,23 @@ export class CdktfProviderProject extends cdk.JsiiProject {
         // If someone knows a better way to do this mutation with minimal custom code, please do so
         prePublishSteps: [
           {
-            name: "Prepare Repository",
-            run: "mv dist .repo",
+            name: "Checkout",
+            uses: "actions/checkout",
+            with: {
+              path: ".repo",
+            },
           },
           {
             name: "Install Dependencies",
             run: "cd .repo && yarn install --check-files --frozen-lockfile",
+          },
+          {
+            name: "Extract build artifact",
+            run: "tar --strip-components=1 -xzvf dist/js/*.tgz -C .repo",
+          },
+          {
+            name: "Move build artifact out of the way",
+            run: "mv dist dist.old",
           },
           {
             name: "Create go artifact",
@@ -253,11 +265,6 @@ export class CdktfProviderProject extends cdk.JsiiProject {
       workflowRunsOn,
       licensed: false, // we do supply our own license file with a custom header
       releaseToNpm: true,
-      devDeps: [
-        "@actions/core@^1.1.0",
-        "dot-prop@^5.2.0",
-        ...(options.devDeps ?? []),
-      ],
       name: packageInfo.npm.name,
       description: `Prebuilt ${providerName} Provider for Terraform CDK (cdktf)`,
       keywords: ["cdktf", "terraform", "cdk", "provider", providerName],
@@ -312,6 +319,15 @@ export class CdktfProviderProject extends cdk.JsiiProject {
       docgen: false,
     });
 
+    this.addDevDeps(
+      "dot-prop@^5.2.0",
+      "@actions/core@^1.1.0",
+      "@action-validator/core",
+      "@action-validator/cli"
+    );
+    // This is a temporary workaround to allow upgrade-main to succeed until we upgrade to Node 20
+    this.package.addPackageResolutions(`cssstyle@4.1.0`);
+
     // Default memory is 7GB: https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources
     // Custom Runners we use have 32GB of memory
     // The below numbers set heap limits that are ~1gb and ~0.5gb less, respectively, than the total available memory
@@ -324,6 +340,13 @@ export class CdktfProviderProject extends cdk.JsiiProject {
     );
 
     this.tasks.addEnvironment("CHECKPOINT_DISABLE", "1");
+
+    const validateTask = this.addTask("validate-workflows", {
+      exec: `find ./.github/workflows -type f -name "*.yml" -print0 | xargs -0 -n 1 npx action-validator`,
+    });
+    validateTask.description =
+      "Lint the YAML files generated by Projen to define GitHub Actions and Workflows, checking them against published JSON schemas";
+    this.postCompileTask.spawn(validateTask);
 
     this.package.addPackageResolutions("@types/yargs@17.0.13");
 
@@ -341,6 +364,12 @@ export class CdktfProviderProject extends cdk.JsiiProject {
       setSafeDirectory
     );
 
+    // always publish a new GitHub release, even when publishing to a particular package manager fails
+    const releaseWorkflow = this.tryFindObjectFile(
+      ".github/workflows/release.yml"
+    );
+    releaseWorkflow?.addOverride("jobs.release_github.needs", "release");
+
     // ensure we don't fail if the release file is not present
     const checkExistingTagStep = (
       this.release as any
@@ -350,10 +379,10 @@ export class CdktfProviderProject extends cdk.JsiiProject {
     const oldExistingTagRun: string = checkExistingTagStep.run;
     prettyAssertEqual(
       oldExistingTagRun.split("\n")[0],
-      "TAG=$(cat dist/dist/releasetag.txt)",
+      "TAG=$(cat dist/releasetag.txt)",
       "release step changed, please check if the workaround still works!"
     );
-    checkExistingTagStep.run = `if [ ! -f dist/dist/releasetag.txt ]; then (echo "exists=true" >> $GITHUB_OUTPUT) && exit 0; fi\n${oldExistingTagRun}`;
+    checkExistingTagStep.run = `if [ ! -f dist/releasetag.txt ]; then (echo "exists=true" >> $GITHUB_OUTPUT) && exit 0; fi\n${oldExistingTagRun}`;
 
     if (!isDeprecated) {
       const { upgrade, pr } = (this.upgradeWorkflow as any).workflows[0].jobs;
@@ -369,7 +398,7 @@ export class CdktfProviderProject extends cdk.JsiiProject {
     // Fix maven issue (https://github.com/cdklabs/publib/pull/777)
     // github.GitHub.of(this)?.tryFindWorkflow("release")?.file?.patch(
     //   JsonPatch.add(
-    //     "/jobs/release_maven/steps/8/env/MAVEN_OPTS",
+    //     "/jobs/release_maven/steps/10/env/MAVEN_OPTS",
     //     // See https://stackoverflow.com/questions/70153962/nexus-staging-maven-plugin-maven-deploy-failed-an-api-incompatibility-was-enco
     //     "--add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.text=ALL-UNNAMED --add-opens=java.desktop/java.awt.font=ALL-UNNAMED"
     //   )
