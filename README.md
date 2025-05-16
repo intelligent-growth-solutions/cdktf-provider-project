@@ -2,6 +2,8 @@
 
 Forked from https://github.com/cdktf/cdktf-provider-project.
 
+A project template for [projen](https://github.com/eladb/projen) to create repositories for prebuilt provider packages for [Terraform CDK](https://cdk.tf).
+
 Run
 
 ```
@@ -12,11 +14,10 @@ yarn build
 Changes made from cdktf project:
 
 - update `npmRegistryUrl` in `src/index.js` to point at github package registry
+- modify `src/provider-upgrade.ts` to take in the `npmInstallEnvVar` to point at the github package registry
 - update `.projenrc.ts` to change project details
 - override env var and token permissions to retrieve package in Github actions
 - remove other language builds
-
-A project template for [projen](https://github.com/eladb/projen) to create repositories for prebuilt provider packages for [Terraform CDK](https://cdk.tf).
 
 ## Usage
 
