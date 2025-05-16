@@ -567,6 +567,10 @@ export class CdktfProviderProject extends cdk.JsiiProject {
       "jobs.build.env.GITHUB_TOKEN",
       `\${{ secrets.${npmInstallEnvVar} }}`
     );
+    (this.buildWorkflow as any).workflow.file.addOverride(
+      "jobs.package-js.env.GITHUB_TOKEN",
+      `\${{ secrets.${npmInstallEnvVar} }}`
+    );
     // Undo the changes after compilation
     this.buildWorkflow?.addPostBuildSteps({
       name: "Revert package.json version bump",
