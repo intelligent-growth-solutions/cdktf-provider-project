@@ -1,4 +1,4 @@
-# Terraform CDK Grafana Provider
+# Terraform CDK Provider Project
 
 Forked from https://github.com/cdktf/cdktf-provider-project.
 
