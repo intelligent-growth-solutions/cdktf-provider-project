@@ -359,6 +359,11 @@ export class CdktfProviderProject extends cdk.JsiiProject {
       const { upgrade, pr } = (this.upgradeWorkflow as any).workflows[0].jobs;
       upgrade.steps.splice(1, 0, setSafeDirectory);
       pr.steps.splice(1, 0, setSafeDirectory);
+
+      this.upgradeWorkflow?.workflows[0].file?.addOverride(
+        "jobs.upgrade.env.GITHUB_TOKEN",
+        "${{ secrets.GITHUB_TOKEN }}"
+      );
     }
 
     // Fix maven issue (https://github.com/cdklabs/publib/pull/777)
@@ -557,6 +562,10 @@ export class CdktfProviderProject extends cdk.JsiiProject {
     (this.buildWorkflow as any).workflow.file.addOverride(
       "jobs.build.steps.0.with.fetch-depth",
       0
+    );
+    (this.buildWorkflow as any).workflow.file.addOverride(
+      "jobs.build.env.GITHUB_TOKEN",
+      "${{ secrets.GITHUB_TOKEN }}"
     );
     // Undo the changes after compilation
     this.buildWorkflow?.addPostBuildSteps({
