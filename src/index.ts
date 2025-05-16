@@ -362,7 +362,7 @@ export class CdktfProviderProject extends cdk.JsiiProject {
 
       this.upgradeWorkflow?.workflows[0].file?.addOverride(
         "jobs.upgrade.env.GITHUB_TOKEN",
-        `\${{ secrets..${npmInstallEnvVar} }}`
+        `\${{ secrets.${npmInstallEnvVar} }}`
       );
     }
 
@@ -565,7 +565,7 @@ export class CdktfProviderProject extends cdk.JsiiProject {
     );
     (this.buildWorkflow as any).workflow.file.addOverride(
       "jobs.build.env.GITHUB_TOKEN",
-      `\${{ secrets..${npmInstallEnvVar} }}`
+      `\${{ secrets.${npmInstallEnvVar} }}`
     );
     // Undo the changes after compilation
     this.buildWorkflow?.addPostBuildSteps({
