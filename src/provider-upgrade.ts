@@ -11,6 +11,7 @@ interface ProviderUpgradeOptions {
   checkForUpgradesScriptPath: string;
   workflowRunsOn: string[];
   nodeHeapSize: string;
+  npmInstallEnvVar?: string;
 }
 /**
  * Checks for new versions of the given provider and creates a PR with an upgrade change if there are changes.
@@ -133,6 +134,9 @@ export class ProviderUpgrade {
         runsOn: options.workflowRunsOn,
         env: {
           NODE_OPTIONS: `--max-old-space-size=${options.nodeHeapSize}`,
+          GITHUB_TOKEN: `\${{ secrets.${
+            options.npmInstallEnvVar ?? "GITHUB_TOKEN"
+          } }}`,
         },
         steps,
         permissions: {

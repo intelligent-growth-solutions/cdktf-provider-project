@@ -391,7 +391,7 @@ export class CdktfProviderProject extends cdk.JsiiProject {
 
       this.upgradeWorkflow?.workflows[0].file?.addOverride(
         "jobs.upgrade.env.GITHUB_TOKEN",
-        "${{ secrets.GITHUB_TOKEN }}"
+        `\${{ secrets.${npmInstallEnvVar} }}`
       );
     }
 
@@ -436,6 +436,7 @@ export class CdktfProviderProject extends cdk.JsiiProject {
         checkForUpgradesScriptPath: upgradeScript.path,
         workflowRunsOn,
         nodeHeapSize: maxOldSpaceSize,
+        npmInstallEnvVar: npmInstallEnvVar,
       });
       new AlertOpenPrs(this, {
         slackWebhookUrl: "${{ secrets.ALERT_PRS_SLACK_WEBHOOK_URL }}",
@@ -590,12 +591,25 @@ export class CdktfProviderProject extends cdk.JsiiProject {
     );
     (this.buildWorkflow as any).workflow.file.addOverride(
       "jobs.build.env.GITHUB_TOKEN",
-      "${{ secrets.GITHUB_TOKEN }}"
+      `\${{ secrets.${npmInstallEnvVar} }}`
+    );
+    (this.buildWorkflow as any).workflow.file.addOverride(
+      "jobs.package-js.env.GITHUB_TOKEN",
+      `\${{ secrets.${npmInstallEnvVar} }}`
     );
     // Undo the changes after compilation
     this.buildWorkflow?.addPostBuildSteps({
       name: "Revert package.json version bump",
       run: "git checkout package.json",
+    });
+
+    const forceReleaseWorkflow = this.tryFindObjectFile(
+      ".github/workflows/force-release.yml"
+    );
+    forceReleaseWorkflow?.addDeletionOverride("jobs.force_release_golang");
+    forceReleaseWorkflow?.addOverride(`jobs.force-release.env`, {
+      CI: "true",
+      GITHUB_TOKEN: `\${{ secrets.${npmInstallEnvVar} }}`,
     });
 
     new CopyrightHeaders(this);
