@@ -558,6 +558,10 @@ export class CdktfProviderProject extends cdk.JsiiProject {
       "jobs.build.steps.0.with.fetch-depth",
       0
     );
+    (this.buildWorkflow as any).workflow.file.addOverride(
+      "jobs.build.env.GITHUB_TOKEN",
+      "${{ secrets.GITHUB_TOKEN }}"
+    );
     // Undo the changes after compilation
     this.buildWorkflow?.addPostBuildSteps({
       name: "Revert package.json version bump",
