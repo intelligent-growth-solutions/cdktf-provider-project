@@ -509,10 +509,6 @@ export class CdktfProviderProject extends cdk.JsiiProject {
       },
     ]);
 
-    const releaseWorkflow = this.tryFindObjectFile(
-      ".github/workflows/release.yml"
-    );
-
     const release_tags = [
       "release",
       "deprecate",

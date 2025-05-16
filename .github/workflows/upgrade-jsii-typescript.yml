@@ -3,7 +3,7 @@
 name: upgrade-jsii-typescript
 on:
   schedule:
-    - cron: 52 3 * * *
+    - cron: 31 2 * * *
   workflow_dispatch:
     inputs:
       version:
