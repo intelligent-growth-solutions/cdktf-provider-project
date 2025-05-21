@@ -75,7 +75,7 @@
     "fs-extra"
   ],
   "engines": {
-    "node": ">= 18.12.0"
+    "node": ">= 18.17.0"
   },
   "main": "lib/index.js",
   "license": "MPL-2.0",
