@@ -4,7 +4,7 @@
  */
 
 import { javascript } from "projen";
-import { JobPermission } from "projen/lib/github/workflows-model";
+import { JobPermission, JobStep } from "projen/lib/github/workflows-model";
 import { generateRandomCron } from "./util/random-cron";
 
 interface ProviderUpgradeOptions {
@@ -48,6 +48,87 @@ export class ProviderUpgrade {
     const newVersion = "${{ steps.new_version.outputs.value }}";
     const semanticType = "${{ steps.release.outputs.type }}";
 
+    const steps: JobStep[] = [
+      {
+        name: "Checkout",
+        uses: "actions/checkout",
+      },
+      {
+        name: "Setup Terraform",
+        uses: "hashicorp/setup-terraform",
+        with: {
+          terraform_wrapper: false,
+        },
+      },
+      {
+        name: "Setup Node.js",
+        uses: "actions/setup-node",
+        with: {
+          "node-version": project.minNodeVersion,
+        },
+      },
+      { run: "yarn install" },
+      {
+        id: "check_version",
+        run: "yarn check-if-new-provider-version",
+      },
+      {
+        name: "get provider current version",
+        if: newerVersionAvailable,
+        id: "current_version",
+        run: `echo "value=$(jq -r '.cdktf.provider.version' package.json)" >> $GITHUB_OUTPUT`,
+      },
+      {
+        run: "yarn fetch",
+        if: newerVersionAvailable,
+        env: {
+          CHECKPOINT_DISABLE: "1",
+          GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
+        },
+      },
+      {
+        name: "get provider updated version",
+        if: newerVersionAvailable,
+        id: "new_version",
+        run: `echo "value=$(jq -r '. | to_entries[] | .value' src/version.json)" >> $GITHUB_OUTPUT`,
+      },
+      {
+        name: "Determine if this is a minor or patch release",
+        if: newerVersionAvailable,
+        id: "release",
+        env: {
+          CURRENT_VERSION: currentVersion,
+          NEW_VERSION: newVersion,
+        },
+        run: [
+          `CURRENT_VERSION_MINOR=$(cut -d "." -f 2 <<< "$CURRENT_VERSION")`,
+          `NEW_VERSION_MINOR=$(cut -d "." -f 2 <<< "$NEW_VERSION")`,
+          `[[ "$CURRENT_VERSION_MINOR" != "$NEW_VERSION_MINOR" ]] && IS_MINOR_RELEASE=true || IS_MINOR_RELEASE=false`,
+          `[[ "$IS_MINOR_RELEASE" == "true" ]] && SEMANTIC_TYPE=feat || SEMANTIC_TYPE=fix`,
+          `echo "is_minor=$IS_MINOR_RELEASE" >> $GITHUB_OUTPUT`,
+          `echo "type=$SEMANTIC_TYPE" >> $GITHUB_OUTPUT`,
+        ].join("\n"),
+      },
+      // submit a PR
+      {
+        name: "Create Pull Request",
+        if: newerVersionAvailable,
+        uses: "peter-evans/create-pull-request",
+        with: {
+          branch: "auto/provider-upgrade",
+          "commit-message": `${semanticType}: upgrade provider from \`${currentVersion}\` to version \`${newVersion}\``,
+          title: `${semanticType}: upgrade provider from \`${currentVersion}\` to version \`${newVersion}\``,
+          body: `This PR upgrades the underlying Terraform provider to version ${newVersion}`,
+          labels: "automerge,auto-approve",
+          token: "${{ secrets.GH_TOKEN }}",
+          "delete-branch": true,
+          committer: "team-tf-cdk <github-team-tf-cdk@hashicorp.com>",
+          author: "Team Terraform CDK <github-team-tf-cdk@hashicorp.com>",
+          signoff: true,
+        },
+      },
+    ];
+
     workflow.addJobs({
       upgrade: {
         runsOn: options.workflowRunsOn,
@@ -57,75 +138,7 @@ export class ProviderUpgrade {
             options.npmInstallEnvVar ?? "GITHUB_TOKEN"
           } }}`,
         },
-        steps: [
-          {
-            name: "Checkout",
-            uses: "actions/checkout@v4",
-          },
-          { run: "yarn install" },
-          {
-            id: "check_version",
-            run: "yarn check-if-new-provider-version",
-          },
-          {
-            name: "get provider current version",
-            if: newerVersionAvailable,
-            id: "current_version",
-            run: `echo "value=$(jq -r '.cdktf.provider.version' package.json)" >> $GITHUB_OUTPUT`,
-          },
-          {
-            run: "yarn fetch",
-            if: newerVersionAvailable,
-            env: {
-              CHECKPOINT_DISABLE: "1",
-              GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
-            },
-          },
-          {
-            name: "get provider updated version",
-            if: newerVersionAvailable,
-            id: "new_version",
-            run: `echo "value=$(jq -r '. | to_entries[] | .value' src/version.json)" >> $GITHUB_OUTPUT`,
-          },
-          {
-            name: "Determine if this is a minor or patch release",
-            if: newerVersionAvailable,
-            id: "release",
-            env: {
-              CURRENT_VERSION: currentVersion,
-              NEW_VERSION: newVersion,
-            },
-            run: [
-              `CURRENT_VERSION_MINOR=$(cut -d "." -f 2 <<< "$CURRENT_VERSION")`,
-              `NEW_VERSION_MINOR=$(cut -d "." -f 2 <<< "$NEW_VERSION")`,
-              `[[ "$CURRENT_VERSION_MINOR" != "$NEW_VERSION_MINOR" ]] && IS_MINOR_RELEASE=true || IS_MINOR_RELEASE=false`,
-              `[[ "$IS_MINOR_RELEASE" == "true" ]] && SEMANTIC_TYPE=feat || SEMANTIC_TYPE=fix`,
-              `echo "is_minor=$IS_MINOR_RELEASE" >> $GITHUB_OUTPUT`,
-              `echo "type=$SEMANTIC_TYPE" >> $GITHUB_OUTPUT`,
-            ].join("\n"),
-          },
-          // generate docs
-          { run: "yarn compile", if: newerVersionAvailable },
-          { run: "yarn docgen", if: newerVersionAvailable },
-          // submit a PR
-          {
-            name: "Create Pull Request",
-            if: newerVersionAvailable,
-            uses: "peter-evans/create-pull-request@v3",
-            with: {
-              branch: "auto/provider-upgrade",
-              "commit-message": `${semanticType}: upgrade provider from \`${currentVersion}\` to version \`${newVersion}\``,
-              title: `${semanticType}: upgrade provider from \`${currentVersion}\` to version \`${newVersion}\``,
-              body: `This PR upgrades the underlying Terraform provider to version ${newVersion}`,
-              labels: "automerge,auto-approve",
-              token: "${{ secrets.GH_TOKEN }}",
-              "delete-branch": true,
-              committer: "team-tf-cdk <github-team-tf-cdk@hashicorp.com>",
-              author: "Team Terraform CDK <github-team-tf-cdk@hashicorp.com>",
-              signoff: true,
-            },
-          },
-        ],
+        steps,
         permissions: {
           pullRequests: JobPermission.WRITE,
           issues: JobPermission.WRITE,

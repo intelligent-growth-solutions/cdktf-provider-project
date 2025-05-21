@@ -59,7 +59,7 @@ export class AutoCloseCommunityIssues {
       steps: [
         {
           name: "Checkout",
-          uses: "actions/checkout@v4",
+          uses: "actions/checkout",
         },
         {
           name: "Auto-close issues by non-collaborators",
@@ -87,11 +87,11 @@ export class AutoCloseCommunityIssues {
         contents: JobPermission.READ,
         pullRequests: JobPermission.WRITE,
       },
-      if: `github.event.pull_request.user.login != 'team-tf-cdk' && !contains(${maintainerStatuses}, github.event.pull_request.author_association)`,
+      if: `github.event.pull_request.user.login != 'team-tf-cdk' && github.actor != 'dependabot[bot]' && !contains(${maintainerStatuses}, github.event.pull_request.author_association)`,
       steps: [
         {
           name: "Checkout",
-          uses: "actions/checkout@v4",
+          uses: "actions/checkout",
         },
         {
           name: "Auto-close PRs by non-collaborators",

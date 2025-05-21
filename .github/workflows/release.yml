@@ -11,6 +11,9 @@ on:
       - .github/dependabot.yml
       - .github/**/*.md
   workflow_dispatch: {}
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -23,7 +26,7 @@ jobs:
       CI: "true"
     steps:
       - name: Checkout
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           fetch-depth: 0
       - name: Set git identity
@@ -31,7 +34,7 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
       - name: Setup Node.js
-        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b
+        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e
         with:
           node-version: 18.17.0
       - name: Install dependencies
@@ -41,7 +44,7 @@ jobs:
       - name: Check if version has already been tagged
         id: check_tag_exists
         run: |-
-          TAG=$(cat dist/dist/releasetag.txt)
+          TAG=$(cat dist/releasetag.txt)
           ([ ! -z "$TAG" ] && git ls-remote -q --exit-code --tags origin $TAG && (echo "exists=true" >> $GITHUB_OUTPUT)) || (echo "exists=false" >> $GITHUB_OUTPUT)
           cat $GITHUB_OUTPUT
       - name: Check for new commits
@@ -55,7 +58,7 @@ jobs:
         continue-on-error: true
       - name: Upload artifact
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
-        uses: actions/upload-artifact@89ef406dd8d7e03cfd12d9e0a4a378f454709029
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: build-artifact
           path: dist
@@ -70,21 +73,17 @@ jobs:
       contents: write
     if: needs.release.outputs.tag_exists != 'true' && needs.release.outputs.latest_commit == github.sha
     steps:
-      - uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b
+      - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e
         with:
           node-version: 18.17.0
       - name: Download build artifacts
-        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16
+        uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e
         with:
           name: build-artifact
           path: dist
       - name: Restore build artifact permissions
         run: cd dist && setfacl --restore=permissions-backup.acl
         continue-on-error: true
-      - name: Prepare Repository
-        run: mv dist .repo
-      - name: Collect GitHub Metadata
-        run: mv .repo/dist dist
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -100,24 +99,30 @@ jobs:
       packages: write
     if: needs.release.outputs.tag_exists != 'true' && needs.release.outputs.latest_commit == github.sha
     steps:
-      - uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b
+      - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e
         with:
           node-version: 18.17.0
       - name: Download build artifacts
-        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16
+        uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e
         with:
           name: build-artifact
           path: dist
       - name: Restore build artifact permissions
         run: cd dist && setfacl --restore=permissions-backup.acl
         continue-on-error: true
-      - name: Prepare Repository
-        run: mv dist .repo
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          path: .repo
       - name: Install Dependencies
         run: cd .repo && yarn install --check-files --frozen-lockfile
+      - name: Extract build artifact
+        run: tar --strip-components=1 -xzvf dist/js/*.tgz -C .repo
+      - name: Move build artifact out of the way
+        run: mv dist dist.old
       - name: Create js artifact
         run: cd .repo && npx projen package:js
-      - name: Collect js Artifact
+      - name: Collect js artifact
         run: mv .repo/dist dist
       - name: Release
         env:

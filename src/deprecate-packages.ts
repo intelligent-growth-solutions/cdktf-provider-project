@@ -52,7 +52,14 @@ export class DeprecatePackages {
         steps: [
           {
             name: "Checkout",
-            uses: "actions/checkout@v4",
+            uses: "actions/checkout",
+          },
+          {
+            name: "Setup Node.js",
+            uses: "actions/setup-node",
+            with: {
+              "node-version": project.minNodeVersion,
+            },
           },
           {
             name: "Install",

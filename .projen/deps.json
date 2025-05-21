@@ -1,6 +1,14 @@
 {
   "dependencies": [
     {
+      "name": "@action-validator/cli",
+      "type": "build"
+    },
+    {
+      "name": "@action-validator/core",
+      "type": "build"
+    },
+    {
       "name": "@types/fs-extra",
       "type": "build"
     },
@@ -25,6 +33,11 @@
     {
       "name": "@typescript-eslint/parser",
       "version": "^6",
+      "type": "build"
+    },
+    {
+      "name": "commit-and-tag-version",
+      "version": "^12",
       "type": "build"
     },
     {
@@ -72,6 +85,7 @@
     },
     {
       "name": "jsii-docgen",
+      "version": "^10.5.0",
       "type": "build"
     },
     {
@@ -80,12 +94,12 @@
     },
     {
       "name": "jsii-rosetta",
-      "version": "~5.3.0",
+      "version": "~5.6.0",
       "type": "build"
     },
     {
       "name": "jsii",
-      "version": "~5.3.0",
+      "version": "~5.6.0",
       "type": "build"
     },
     {
@@ -94,11 +108,6 @@
     },
     {
       "name": "projen",
-      "type": "build"
-    },
-    {
-      "name": "standard-version",
-      "version": "^9",
       "type": "build"
     },
     {
@@ -111,7 +120,7 @@
     },
     {
       "name": "typescript",
-      "version": "~5.3.0",
+      "version": "~5.6.0",
       "type": "build"
     },
     {
@@ -123,13 +132,18 @@
       "type": "bundled"
     },
     {
+      "name": "cssstyle",
+      "version": "4.1.0",
+      "type": "override"
+    },
+    {
       "name": "constructs",
-      "version": "^10.3.0",
+      "version": "^10.4.2",
       "type": "peer"
     },
     {
       "name": "projen",
-      "version": "^0.85.0",
+      "version": "^0.87.4",
       "type": "peer"
     },
     {

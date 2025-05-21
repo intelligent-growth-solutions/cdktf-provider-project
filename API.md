@@ -72,7 +72,7 @@ Returns a string representation of this construct.
 ##### `addExcludeFromCleanup` <a name="addExcludeFromCleanup" id="@intelligent-growth-solutions/provider-project.CdktfProviderProject.addExcludeFromCleanup"></a>
 
 ```typescript
-public addExcludeFromCleanup(globs: string): void
+public addExcludeFromCleanup(globs: ...string[]): void
 ```
 
 Exclude the matching files from pre-synth cleanup.
@@ -82,7 +82,7 @@ source files include the projen marker and we don't want them to be erased durin
 
 ###### `globs`<sup>Required</sup> <a name="globs" id="@intelligent-growth-solutions/provider-project.CdktfProviderProject.addExcludeFromCleanup.parameter.globs"></a>
 
-- *Type:* string
+- *Type:* ...string[]
 
 The glob patterns to match.
 
@@ -338,7 +338,7 @@ public addBins(bins: {[ key: string ]: string}): void
 ##### `addBundledDeps` <a name="addBundledDeps" id="@intelligent-growth-solutions/provider-project.CdktfProviderProject.addBundledDeps"></a>
 
 ```typescript
-public addBundledDeps(deps: string): void
+public addBundledDeps(deps: ...string[]): void
 ```
 
 Defines bundled dependencies.
@@ -348,7 +348,7 @@ Bundled dependencies will be added as normal dependencies as well as to the
 
 ###### `deps`<sup>Required</sup> <a name="deps" id="@intelligent-growth-solutions/provider-project.CdktfProviderProject.addBundledDeps.parameter.deps"></a>
 
-- *Type:* string
+- *Type:* ...string[]
 
 Names modules to install.
 
@@ -363,28 +363,28 @@ add/upgrade`. If you wish to specify a version range use this syntax:
 ##### ~~`addCompileCommand`~~ <a name="addCompileCommand" id="@intelligent-growth-solutions/provider-project.CdktfProviderProject.addCompileCommand"></a>
 
 ```typescript
-public addCompileCommand(commands: string): void
+public addCompileCommand(commands: ...string[]): void
 ```
 
 DEPRECATED.
 
 ###### `commands`<sup>Required</sup> <a name="commands" id="@intelligent-growth-solutions/provider-project.CdktfProviderProject.addCompileCommand.parameter.commands"></a>
 
-- *Type:* string
+- *Type:* ...string[]
 
 ---
 
 ##### `addDeps` <a name="addDeps" id="@intelligent-growth-solutions/provider-project.CdktfProviderProject.addDeps"></a>
 
 ```typescript
-public addDeps(deps: string): void
+public addDeps(deps: ...string[]): void
 ```
 
 Defines normal dependencies.
 
 ###### `deps`<sup>Required</sup> <a name="deps" id="@intelligent-growth-solutions/provider-project.CdktfProviderProject.addDeps.parameter.deps"></a>
 
-- *Type:* string
+- *Type:* ...string[]
 
 Names modules to install.
 
@@ -399,14 +399,14 @@ add/upgrade`. If you wish to specify a version range use this syntax:
 ##### `addDevDeps` <a name="addDevDeps" id="@intelligent-growth-solutions/provider-project.CdktfProviderProject.addDevDeps"></a>
 
 ```typescript
-public addDevDeps(deps: string): void
+public addDevDeps(deps: ...string[]): void
 ```
 
 Defines development/test dependencies.
 
 ###### `deps`<sup>Required</sup> <a name="deps" id="@intelligent-growth-solutions/provider-project.CdktfProviderProject.addDevDeps.parameter.deps"></a>
 
-- *Type:* string
+- *Type:* ...string[]
 
 Names modules to install.
 
@@ -437,14 +437,14 @@ The fields to set.
 ##### `addKeywords` <a name="addKeywords" id="@intelligent-growth-solutions/provider-project.CdktfProviderProject.addKeywords"></a>
 
 ```typescript
-public addKeywords(keywords: string): void
+public addKeywords(keywords: ...string[]): void
 ```
 
 Adds keywords to package.json (deduplicated).
 
 ###### `keywords`<sup>Required</sup> <a name="keywords" id="@intelligent-growth-solutions/provider-project.CdktfProviderProject.addKeywords.parameter.keywords"></a>
 
-- *Type:* string
+- *Type:* ...string[]
 
 The keywords to add.
 
@@ -453,7 +453,7 @@ The keywords to add.
 ##### `addPeerDeps` <a name="addPeerDeps" id="@intelligent-growth-solutions/provider-project.CdktfProviderProject.addPeerDeps"></a>
 
 ```typescript
-public addPeerDeps(deps: string): void
+public addPeerDeps(deps: ...string[]): void
 ```
 
 Defines peer dependencies.
@@ -464,7 +464,7 @@ your code against the minimum version required from your consumers.
 
 ###### `deps`<sup>Required</sup> <a name="deps" id="@intelligent-growth-solutions/provider-project.CdktfProviderProject.addPeerDeps.parameter.deps"></a>
 
-- *Type:* string
+- *Type:* ...string[]
 
 Names modules to install.
 
@@ -495,14 +495,14 @@ The scripts to set.
 ##### ~~`addTestCommand`~~ <a name="addTestCommand" id="@intelligent-growth-solutions/provider-project.CdktfProviderProject.addTestCommand"></a>
 
 ```typescript
-public addTestCommand(commands: string): void
+public addTestCommand(commands: ...string[]): void
 ```
 
 DEPRECATED.
 
 ###### `commands`<sup>Required</sup> <a name="commands" id="@intelligent-growth-solutions/provider-project.CdktfProviderProject.addTestCommand.parameter.commands"></a>
 
-- *Type:* string
+- *Type:* ...string[]
 
 ---
 
@@ -1603,7 +1603,7 @@ const cdktfProviderProjectOptions: CdktfProviderProjectOptions = { ... }
 | <code><a href="#@intelligent-growth-solutions/provider-project.CdktfProviderProjectOptions.property.releaseTrigger">releaseTrigger</a></code> | <code>projen.release.ReleaseTrigger</code> | The release trigger to use. |
 | <code><a href="#@intelligent-growth-solutions/provider-project.CdktfProviderProjectOptions.property.releaseWorkflowName">releaseWorkflowName</a></code> | <code>string</code> | The name of the default release workflow. |
 | <code><a href="#@intelligent-growth-solutions/provider-project.CdktfProviderProjectOptions.property.releaseWorkflowSetupSteps">releaseWorkflowSetupSteps</a></code> | <code>projen.github.workflows.JobStep[]</code> | A set of workflow steps to execute in order to setup the workflow container. |
-| <code><a href="#@intelligent-growth-solutions/provider-project.CdktfProviderProjectOptions.property.versionrcOptions">versionrcOptions</a></code> | <code>{[ key: string ]: any}</code> | Custom configuration used when creating changelog with standard-version package. |
+| <code><a href="#@intelligent-growth-solutions/provider-project.CdktfProviderProjectOptions.property.versionrcOptions">versionrcOptions</a></code> | <code>{[ key: string ]: any}</code> | Custom configuration used when creating changelog with commit-and-tag-version package. |
 | <code><a href="#@intelligent-growth-solutions/provider-project.CdktfProviderProjectOptions.property.workflowContainerImage">workflowContainerImage</a></code> | <code>string</code> | Container image to use for GitHub workflows. |
 | <code><a href="#@intelligent-growth-solutions/provider-project.CdktfProviderProjectOptions.property.workflowRunsOn">workflowRunsOn</a></code> | <code>string[]</code> | Github Runner selection labels. |
 | <code><a href="#@intelligent-growth-solutions/provider-project.CdktfProviderProjectOptions.property.workflowRunsOnGroup">workflowRunsOnGroup</a></code> | <code>projen.GroupRunnerOptions</code> | Github Runner Group selection options. |
@@ -2948,7 +2948,7 @@ public readonly versionrcOptions: {[ key: string ]: any};
 - *Type:* {[ key: string ]: any}
 - *Default:* standard configuration applicable for GitHub repositories
 
-Custom configuration used when creating changelog with standard-version package.
+Custom configuration used when creating changelog with commit-and-tag-version package.
 
 Given values either append to default configuration or overwrite values in it.
 

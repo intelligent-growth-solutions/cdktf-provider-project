@@ -61,14 +61,15 @@ export class AlertOpenPrs {
         {
           name: "Alert Slack on old PRs",
           if: "${{ steps.old_prs.outputs.pr_links }}",
-          uses: "slackapi/slack-github-action@v1.23.0",
+          uses: "slackapi/slack-github-action",
           with: {
+            webhook: slackWebhookUrl,
+            "webhook-type": "webhook-trigger",
             payload: JSON.stringify({
               pr_links:
                 "${{ join(fromJSON(steps.old_prs.outputs.pr_links), ', ') }}",
             }),
           },
-          env: { SLACK_WEBHOOK_URL: slackWebhookUrl },
         },
       ],
       continueOnError: true, // this job fails sometimes due to Slack timeouts (503s and 504s) but it's really not a big deal if it does
